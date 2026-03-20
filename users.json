@@ -1,0 +1,23 @@
+{
+  "exporter": {
+    "password": "export123",
+    "role": "exporter",
+    "name": "Tata Exports Ltd",
+    "company": "Tata Exports Ltd",
+    "country": "India"
+  },
+  "importer": {
+    "password": "import123",
+    "role": "importer",
+    "name": "Global Traders GmbH",
+    "company": "Global Traders GmbH",
+    "country": "Germany"
+  },
+  "customs": {
+    "password": "customs123",
+    "role": "customs",
+    "name": "Hamburg Customs Authority",
+    "company": "Federal Customs Authority",
+    "country": "Germany"
+  }
+}
