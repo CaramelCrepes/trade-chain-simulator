@@ -1,0 +1,19 @@
+{
+  "index": 1,
+  "timestamp": "2024-03-01 10:01:00",
+  "document": {
+    "type": "Bill of Lading",
+    "shipment_id": "SHP-2024-001",
+    "date_issued": "2024-03-01",
+    "exporter": "Tata Exports Ltd",
+    "importer": "Global Traders GmbH",
+    "goods_description": "Electronic Components (CPU, RAM, GPU)",
+    "vessel_name": "MV Ocean Harmony",
+    "origin_port": "Mumbai",
+    "destination_port": "Hamburg",
+    "status": "Issued"
+  },
+  "submitted_by": "exporter",
+  "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "a3f2c1d9e8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2"
+}

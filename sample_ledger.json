@@ -1,0 +1,49 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2024-03-01 10:00:00",
+    "document": {
+      "type": "GENESIS",
+      "message": "TradeChain Simulator — Blockchain Initialised"
+    },
+    "submitted_by": "system",
+    "previous_hash": "0",
+    "hash": "genesis_hash_example"
+  },
+  {
+    "index": 1,
+    "timestamp": "2024-03-01 10:01:00",
+    "document": {
+      "type": "Letter of Credit",
+      "shipment_id": "SHP-2024-001",
+      "applicant": "Global Traders GmbH",
+      "beneficiary": "Tata Exports Ltd",
+      "amount": "75000",
+      "currency": "USD",
+      "expiry_date": "2024-12-31",
+      "issuing_bank": "Deutsche Bank",
+      "status": "Active"
+    },
+    "submitted_by": "exporter",
+    "previous_hash": "genesis_hash_example",
+    "hash": "block_1_hash_example"
+  },
+  {
+    "index": 2,
+    "timestamp": "2024-03-01 10:02:00",
+    "document": {
+      "type": "Bill of Lading",
+      "shipment_id": "SHP-2024-001",
+      "exporter": "Tata Exports Ltd",
+      "importer": "Global Traders GmbH",
+      "goods_description": "Electronic Components (CPU, RAM, GPU)",
+      "vessel_name": "MV Ocean Harmony",
+      "origin_port": "Mumbai",
+      "destination_port": "Hamburg",
+      "status": "Issued"
+    },
+    "submitted_by": "exporter",
+    "previous_hash": "block_1_hash_example",
+    "hash": "block_2_hash_example"
+  }
+]
