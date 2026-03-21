@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradeChain — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#070b0f;--surface:#0d1117;--panel:#111820;
+      --border:#1e2d3d;--border2:#253545;
+      --accent:#00c8ff;--green:#10b981;--red:#ef4444;
+      --text:#cdd9e5;--muted:#566a7f;
+      --mono:'Share Tech Mono',monospace;--sans:'DM Sans',sans-serif
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans)}
+    body::before{
+      content:'';position:fixed;inset:0;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),
+                       linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:40px 40px;opacity:.2;pointer-events:none
+    }
+    .wrap{
+      min-height:100vh;display:flex;align-items:center;
+      justify-content:center;padding:2rem;position:relative
+    }
+    .card{
+      background:var(--panel);border:1px solid var(--border);
+      border-radius:12px;padding:2.5rem;width:100%;max-width:420px
+    }
+    .logo{
+      font-family:var(--mono);font-size:1.1rem;color:var(--accent);
+      letter-spacing:.1em;margin-bottom:.3rem
+    }
+    .logo-sub{font-size:.75rem;color:var(--muted);margin-bottom:2rem}
+
+    /* Demo accounts hint */
+    .accounts{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:6px;padding:1rem;margin-bottom:1.75rem
+    }
+    .accounts-title{
+      font-family:var(--mono);font-size:.65rem;color:var(--muted);
+      letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem
+    }
+    .account-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:.35rem 0;border-bottom:1px solid var(--border);cursor:pointer
+    }
+    .account-row:last-child{border-bottom:none}
+    .account-row:hover .account-name{color:var(--accent)}
+    .account-name{font-family:var(--mono);font-size:.78rem;transition:color .15s}
+    .account-role{
+      font-size:.65rem;padding:1px 8px;border-radius:10px;
+      font-family:var(--mono);border:1px solid
+    }
+    .role-exp{border-color:#00c8ff;color:#00c8ff;background:rgba(0,200,255,.07)}
+    .role-imp{border-color:#a78bfa;color:#a78bfa;background:rgba(167,139,250,.07)}
+    .role-cus{border-color:#f59e0b;color:#f59e0b;background:rgba(245,158,11,.07)}
+    .account-pw{font-size:.68rem;color:var(--muted)}
+
+    .form-group{margin-bottom:1rem}
+    label{display:block;font-size:.72rem;color:var(--muted);
+          font-family:var(--mono);margin-bottom:.35rem}
+    input{
+      width:100%;background:var(--bg);border:1px solid var(--border);
+      color:var(--text);padding:.6rem .9rem;border-radius:5px;
+      font-family:var(--sans);font-size:.875rem;outline:none;
+      transition:border-color .15s
+    }
+    input:focus{border-color:var(--accent)}
+    .btn{
+      width:100%;padding:.65rem;border-radius:5px;
+      font-family:var(--mono);font-size:.85rem;font-weight:600;
+      background:var(--accent);color:var(--bg);border:none;
+      cursor:pointer;letter-spacing:.05em;transition:opacity .15s;margin-top:.5rem
+    }
+    .btn:hover{opacity:.85}
+    .alert{
+      padding:.7rem .9rem;border-radius:5px;font-size:.8rem;
+      margin-bottom:1rem;border:1px solid var(--red);
+      background:rgba(239,68,68,.07);color:var(--red)
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="logo">⬡ TRADECHAIN</div>
+    <div class="logo-sub">Blockchain Trade Documentation Simulator</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Quick-fill demo accounts -->
+    <div class="accounts">
+      <div class="accounts-title">Demo Accounts — click to fill</div>
+      <div class="account-row" onclick="fill('exporter','export123')">
+        <span class="account-name">exporter</span>
+        <span class="account-role role-exp">Exporter</span>
+        <span class="account-pw">export123</span>
+      </div>
+      <div class="account-row" onclick="fill('importer','import123')">
+        <span class="account-name">importer</span>
+        <span class="account-role role-imp">Importer</span>
+        <span class="account-pw">import123</span>
+      </div>
+      <div class="account-row" onclick="fill('customs','customs123')">
+        <span class="account-name">customs</span>
+        <span class="account-role role-cus">Customs</span>
+        <span class="account-pw">customs123</span>
+      </div>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label>USERNAME</label>
+        <input type="text" name="username" id="username" placeholder="username" autocomplete="off" required/>
+      </div>
+      <div class="form-group">
+        <label>PASSWORD</label>
+        <input type="password" name="password" id="password" placeholder="password" required/>
+      </div>
+      <button type="submit" class="btn">ENTER SIMULATOR →</button>
+    </form>
+  </div>
+</div>
+<script>
+  function fill(u, p) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+  }
+</script>
+</body>
+</html>

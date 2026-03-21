@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  :root { --accent: var(--exp) }
+  .dynamic-fields { display: none; margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <h1>// EXPORTER DASHBOARD</h1>
+  <p>Submit trade documents to the blockchain — {{ user.company }}</p>
+</div>
+
+<div class="grid-3" style="margin-bottom:1.5rem">
+  <div class="stat">
+    <div class="stat-val" style="color:var(--exp)">{{ blocks|length }}</div>
+    <div class="stat-lbl">Your Submissions</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:var(--exp)">{{ shipment_ids|length }}</div>
+    <div class="stat-lbl">Active Shipments</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:var(--green)">✓</div>
+    <div class="stat-lbl">Chain Status</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Left: Submit Document -->
+  <div class="panel">
+    <div class="panel-title">Submit Document to Blockchain</div>
+
+    <form method="POST" action="/exporter/submit">
+      <div class="form-group">
+        <label>Document Type</label>
+        <select name="doc_type" id="doc_type" onchange="showFields()">
+          <option value="">— Select —</option>
+          <option>Bill of Lading</option>
+          <option>Certificate of Origin</option>
+          <option>Letter of Credit</option>
+          <option>Status Update</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Shipment ID</label>
+        <input type="text" name="shipment_id" placeholder="e.g. SHP-2024-001" required/>
+      </div>
+
+      <!-- Bill of Lading -->
+      <div class="dynamic-fields" id="f-bol">
+        <div class="form-group"><label>Importer Company</label><input type="text" name="importer" placeholder="Global Traders GmbH"/></div>
+        <div class="form-group"><label>Goods Description</label><input type="text" name="goods" placeholder="e.g. Electronic Components"/></div>
+        <div class="form-group"><label>Vessel Name</label><input type="text" name="vessel" placeholder="MV Ocean Harmony"/></div>
+        <div class="form-group"><label>Origin Port</label><input type="text" name="origin_port" placeholder="Mumbai"/></div>
+        <div class="form-group"><label>Destination Port</label><input type="text" name="destination_port" placeholder="Hamburg"/></div>
+      </div>
+
+      <!-- Certificate of Origin -->
+      <div class="dynamic-fields" id="f-coo">
+        <div class="form-group"><label>Goods Description</label><input type="text" name="goods" placeholder="e.g. Textile Products"/></div>
+        <div class="form-group"><label>Issuing Body</label><input type="text" name="issuing_body" placeholder="FICCI Mumbai"/></div>
+      </div>
+
+      <!-- Letter of Credit -->
+      <div class="dynamic-fields" id="f-lc">
+        <div class="form-group"><label>Applicant (Importer)</label><input type="text" name="applicant" placeholder="Global Traders GmbH"/></div>
+        <div class="form-group"><label>Amount</label><input type="text" name="amount" placeholder="75000"/></div>
+        <div class="form-group"><label>Currency</label><input type="text" name="currency" placeholder="USD" value="USD"/></div>
+        <div class="form-group"><label>Expiry Date</label><input type="date" name="expiry_date"/></div>
+        <div class="form-group"><label>Issuing Bank</label><input type="text" name="issuing_bank" placeholder="HDFC Bank"/></div>
+      </div>
+
+      <!-- Status Update -->
+      <div class="dynamic-fields" id="f-su">
+        <div class="form-group">
+          <label>New Status</label>
+          <select name="new_status">
+            <option>Documents Prepared</option>
+            <option>Goods Ready for Shipment</option>
+            <option>Departed Port</option>
+            <option>In Transit</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea name="notes" rows="2" placeholder="Optional notes..."></textarea></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-sm" id="submit-btn" style="display:none;margin-top:.5rem">
+        → Submit to Blockchain
+      </button>
+    </form>
+  </div>
+
+  <!-- Right: My Submissions -->
+  <div class="panel">
+    <div class="panel-title">Your Blockchain Submissions</div>
+    {% if blocks %}
+      <div class="block-scroll">
+        {% for b in blocks|reverse %}
+          <div class="block-card">
+            <div class="block-card-head">
+              <span class="tag tag-index">#{{ b.index }}</span>
+              <span class="tag tag-type">{{ b.document.type }}</span>
+              {% if b.document.shipment_id %}
+                <a class="shp-link" href="/shipment/{{ b.document.shipment_id }}">
+                  {{ b.document.shipment_id }} ↗
+                </a>
+              {% endif %}
+              <span class="block-ts">{{ b.timestamp }}</span>
+            </div>
+            <div class="block-fields">
+              {% for k, v in b.document.items() %}
+                {% if k not in ['type', 'status'] %}
+                  <div class="f"><span>{{ k.replace('_',' ').title() }}</span>{{ v }}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="hash-strip"><strong>HASH</strong> {{ b.hash }}</div>
+          </div>
+          {% if not loop.last %}<div class="chain-link">↕</div>{% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:.82rem;color:var(--muted)">No submissions yet. Use the form to add your first document.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  const map = {
+    "Bill of Lading": "f-bol",
+    "Certificate of Origin": "f-coo",
+    "Letter of Credit": "f-lc",
+    "Status Update": "f-su"
+  };
+  function showFields() {
+    document.querySelectorAll('.dynamic-fields').forEach(el => el.style.display = 'none');
+    const v = document.getElementById('doc_type').value;
+    if (map[v]) document.getElementById(map[v]).style.display = 'block';
+    document.getElementById('submit-btn').style.display = v ? 'inline-flex' : 'none';
+  }
+</script>
+{% endblock %}

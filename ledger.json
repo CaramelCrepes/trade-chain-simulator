@@ -1,0 +1,118 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "GENESIS",
+      "message": "TradeChain Simulator \u2014 Blockchain Initialised"
+    },
+    "previous_hash": "0",
+    "submitted_by": "system",
+    "hash": "3a4170d8cfc813612ba3535b633c879fb5ae8858ef7b394b3d6f727f09821293"
+  },
+  {
+    "index": 1,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "Letter of Credit",
+      "shipment_id": "SHP-2024-001",
+      "date_issued": "2026-03-20",
+      "applicant": "Global Traders GmbH",
+      "beneficiary": "Tata Exports Ltd",
+      "amount": "75000",
+      "currency": "USD",
+      "expiry_date": "2024-12-31",
+      "issuing_bank": "Deutsche Bank",
+      "status": "Active"
+    },
+    "previous_hash": "3a4170d8cfc813612ba3535b633c879fb5ae8858ef7b394b3d6f727f09821293",
+    "submitted_by": "exporter",
+    "hash": "5e6e23589795ddfeebc93e67756347425f52d27f32276a70b6b47a4464dc18f9"
+  },
+  {
+    "index": 2,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "Bill of Lading",
+      "shipment_id": "SHP-2024-001",
+      "date_issued": "2026-03-20",
+      "exporter": "Tata Exports Ltd",
+      "importer": "Global Traders GmbH",
+      "goods_description": "Electronic Components (CPU, RAM, GPU)",
+      "vessel_name": "MV Ocean Harmony",
+      "origin_port": "Mumbai",
+      "destination_port": "Hamburg",
+      "status": "Issued"
+    },
+    "previous_hash": "5e6e23589795ddfeebc93e67756347425f52d27f32276a70b6b47a4464dc18f9",
+    "submitted_by": "exporter",
+    "hash": "35afbd7d66d83ef82e8f12ffbfc0cffae5e4eb9c723325392d37536115f529e9"
+  },
+  {
+    "index": 3,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "Certificate of Origin",
+      "shipment_id": "SHP-2024-001",
+      "date_issued": "2026-03-20",
+      "exporter": "Tata Exports Ltd",
+      "goods_description": "Electronic Components",
+      "country_of_origin": "India",
+      "issuing_body": "FICCI Mumbai",
+      "status": "Certified"
+    },
+    "previous_hash": "35afbd7d66d83ef82e8f12ffbfc0cffae5e4eb9c723325392d37536115f529e9",
+    "submitted_by": "exporter",
+    "hash": "3dacc56543158e9f35e08479eef5a0af1c52ee1cd3f972c1ecf18f1595bc22bd"
+  },
+  {
+    "index": 4,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "Status Update",
+      "shipment_id": "SHP-2024-001",
+      "timestamp": "2026-03-20 23:36:47",
+      "updated_by": "Tata Exports Ltd",
+      "new_status": "Departed Port",
+      "notes": "Vessel departed Mumbai on schedule."
+    },
+    "previous_hash": "3dacc56543158e9f35e08479eef5a0af1c52ee1cd3f972c1ecf18f1595bc22bd",
+    "submitted_by": "exporter",
+    "hash": "ef95c068bc61208bc46a9aec3cbc03ef24c4650ef8177f319c3bf564f232c9a0"
+  },
+  {
+    "index": 5,
+    "timestamp": "2026-03-20 23:36:47",
+    "document": {
+      "type": "Customs Declaration",
+      "shipment_id": "SHP-2024-001",
+      "date_filed": "2026-03-20",
+      "importer": "Global Traders GmbH",
+      "goods_description": "Electronic Components",
+      "declared_value": "75000",
+      "currency": "USD",
+      "hs_code": "8471.30",
+      "status": "Filed"
+    },
+    "previous_hash": "ef95c068bc61208bc46a9aec3cbc03ef24c4650ef8177f319c3bf564f232c9a0",
+    "submitted_by": "importer",
+    "hash": "cd53024c4ac8f0a0f8423099c755094c1794d0488e751cc532a6c31ef7e9414e"
+  },
+  {
+    "index": 6,
+    "timestamp": "2026-03-20 23:52:24",
+    "document": {
+      "type": "Certificate of Origin",
+      "shipment_id": "eouhouc",
+      "date_issued": "2026-03-20",
+      "exporter": "Tata Exports Ltd",
+      "goods_description": "",
+      "country_of_origin": "India",
+      "issuing_body": "dncown",
+      "status": "Certified"
+    },
+    "previous_hash": "cd53024c4ac8f0a0f8423099c755094c1794d0488e751cc532a6c31ef7e9414e",
+    "submitted_by": "exporter",
+    "hash": "5b2f110d575162143f7b0965f7a5b1b960d3ebd8db2deab6e9ff333032e37e40"
+  }
+]

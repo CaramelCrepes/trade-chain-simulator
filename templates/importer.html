@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block head %}
+<style>:root { --accent: var(--imp) }</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <h1>// IMPORTER DASHBOARD</h1>
+  <p>View incoming shipments and file customs declarations — {{ user.company }}</p>
+</div>
+
+<div class="grid-3" style="margin-bottom:1.5rem">
+  <div class="stat">
+    <div class="stat-val" style="color:var(--imp)">{{ blocks|length }}</div>
+    <div class="stat-lbl">Documents Received</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:var(--imp)">{{ shipment_ids|length }}</div>
+    <div class="stat-lbl">Shipments Tracked</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:var(--green)">✓</div>
+    <div class="stat-lbl">Chain Verified</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Left: File Customs Declaration -->
+  <div class="panel">
+    <div class="panel-title">File Customs Declaration</div>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem">
+      Once the exporter ships goods, you must declare them to customs authorities.
+    </p>
+    <form method="POST" action="/importer/submit">
+      <div class="form-group">
+        <label>Shipment ID</label>
+        {% if shipment_ids %}
+          <select name="shipment_id">
+            {% for sid in shipment_ids %}
+              <option value="{{ sid }}">{{ sid }}</option>
+            {% endfor %}
+          </select>
+        {% else %}
+          <input type="text" name="shipment_id" placeholder="SHP-2024-001" required/>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label>Goods Description</label>
+        <input type="text" name="goods" placeholder="e.g. Electronic Components" required/>
+      </div>
+      <div class="form-group">
+        <label>Declared Value</label>
+        <input type="text" name="declared_value" placeholder="75000" required/>
+      </div>
+      <div class="form-group">
+        <label>Currency</label>
+        <input type="text" name="currency" placeholder="USD" value="USD"/>
+      </div>
+      <div class="form-group">
+        <label>HS Code (Harmonized System)</label>
+        <input type="text" name="hs_code" placeholder="e.g. 8471.30"/>
+      </div>
+      <button type="submit" class="btn btn-outline btn-sm" style="margin-top:.25rem">
+        → Submit Declaration
+      </button>
+    </form>
+  </div>
+
+  <!-- Right: Documents related to this importer -->
+  <div class="panel">
+    <div class="panel-title">Incoming Documents</div>
+    {% if blocks %}
+      <div class="block-scroll">
+        {% for b in blocks|reverse %}
+          <div class="block-card">
+            <div class="block-card-head">
+              <span class="tag tag-index">#{{ b.index }}</span>
+              <span class="tag tag-type">{{ b.document.type }}</span>
+              {% if b.document.shipment_id %}
+                <a class="shp-link" href="/shipment/{{ b.document.shipment_id }}">
+                  {{ b.document.shipment_id }} ↗
+                </a>
+              {% endif %}
+              <span class="block-ts">{{ b.timestamp }}</span>
+            </div>
+            <div class="block-fields">
+              {% for k, v in b.document.items() %}
+                {% if k not in ['type', 'status'] %}
+                  <div class="f"><span>{{ k.replace('_',' ').title() }}</span>{{ v }}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="hash-strip"><strong>HASH</strong> {{ b.hash }}</div>
+          </div>
+          {% if not loop.last %}<div class="chain-link">↕</div>{% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:.82rem;color:var(--muted)">
+        No documents found for {{ user.company }} yet.
+        Ask the exporter to submit a Bill of Lading first.
+      </p>
+    {% endif %}
+
+    {% if shipment_ids %}
+      <hr class="divider"/>
+      <div class="panel-title">Quick Shipment Lookup</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+        {% for sid in shipment_ids %}
+          <a href="/shipment/{{ sid }}" class="btn btn-outline btn-sm">{{ sid }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

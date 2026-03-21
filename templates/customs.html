@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  :root { --accent: var(--cus) }
+  .tamper-zone {
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 1.25rem;
+    background: rgba(239,68,68,.04);
+  }
+  .verify-zone {
+    border: 1px solid {% if errors %}var(--red){% else %}var(--green){% endif %};
+    border-radius: 8px;
+    padding: 1.25rem;
+    background: {% if errors %}rgba(239,68,68,.04){% else %}rgba(16,185,129,.04){% endif %};
+  }
+  .error-block {
+    background: var(--surface);
+    border: 1px solid var(--red);
+    border-radius: 6px;
+    padding: .875rem 1rem;
+    margin-bottom: .6rem;
+    font-family: var(--mono);
+    font-size: .72rem;
+  }
+  .error-block .err-type { color: var(--red); margin-bottom: .3rem; font-size: .68rem; }
+  .error-block .err-msg  { color: var(--text); margin-bottom: .5rem; font-size: .8rem; font-family: var(--sans); }
+  .err-hash { color: var(--muted); font-size: .62rem; word-break: break-all; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <h1>// CUSTOMS AUTHORITY DASHBOARD</h1>
+  <p>Verify chain integrity, inspect all trade documents, and clear shipments — {{ user.company }}</p>
+</div>
+
+<div class="grid-3" style="margin-bottom:1.5rem">
+  <div class="stat">
+    <div class="stat-val" style="color:var(--cus)">{{ chain_length }}</div>
+    <div class="stat-lbl">Total Blocks</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:var(--cus)">{{ shipment_ids|length }}</div>
+    <div class="stat-lbl">Shipments on Ledger</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:{% if errors %}var(--red){% else %}var(--green){% endif %}">
+      {% if errors %}✗{% else %}✓{% endif %}
+    </div>
+    <div class="stat-lbl">Chain Integrity</div>
+  </div>
+</div>
+
+<!-- Top row: Verify + Tamper Demo side by side -->
+<div class="grid-2" style="margin-bottom:1.25rem">
+
+  <!-- Chain Verification -->
+  <div class="verify-zone">
+    <div class="panel-title" style="border-bottom-color:{% if errors %}var(--red){% else %}var(--green){% endif %};color:{% if errors %}var(--red){% else %}var(--green){% endif %}">
+      Chain Verification
+    </div>
+    {% if errors %}
+      <div style="margin-bottom:1rem">
+        {% for err in errors %}
+          <div class="error-block">
+            <div class="err-type">⚠ {{ err.type }} — Block #{{ err.block }}</div>
+            <div class="err-msg">{{ err.message }}</div>
+            <div class="err-hash">
+              STORED&nbsp;&nbsp; {{ err.stored }}<br>
+              EXPECTED {{ err.expected }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <form method="POST" action="/customs/restore">
+        <button class="btn btn-green btn-sm">↺ Restore Chain Integrity</button>
+      </form>
+    {% else %}
+      <div style="text-align:center;padding:1.25rem 0">
+        <div style="font-size:2.5rem;margin-bottom:.5rem">🔒</div>
+        <div style="font-family:var(--mono);color:var(--green);font-size:.82rem">
+          ALL {{ chain_length }} BLOCKS VERIFIED
+        </div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">
+          Every hash matches. Every link is intact.
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Tamper Demo Zone -->
+  <div class="tamper-zone">
+    <div class="panel-title" style="border-bottom-color:var(--red);color:var(--red)">
+      ⚠ Fraud Simulation Demo
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6">
+      Simulate a real-world fraud attack: directly alters a financial value in the stored ledger file,
+      just as a bad actor might. Then run verification to see the blockchain detect it instantly.
+    </p>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+      <form method="POST" action="/customs/tamper">
+        <button class="btn btn-danger btn-sm">⚡ Simulate Tamper Attack</button>
+      </form>
+      <form method="POST" action="/customs/restore">
+        <button class="btn btn-green btn-sm">↺ Restore Chain</button>
+      </form>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:.875rem;font-family:var(--mono)">
+      After tampering → check the verification panel on the left.
+    </p>
+  </div>
+</div>
+
+<!-- Clear Shipment + Shipment Links -->
+<div class="grid-2" style="margin-bottom:1.25rem">
+  <div class="panel">
+    <div class="panel-title">Clear a Shipment</div>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">
+      After reviewing all documents, issue an official customs clearance. This adds a new block to the chain.
+    </p>
+    <form method="POST" action="/customs/clear" style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end">
+      <div class="form-group" style="flex:1;margin-bottom:0">
+        <label>Shipment ID</label>
+        {% if shipment_ids %}
+          <select name="shipment_id">
+            {% for sid in shipment_ids %}
+              <option>{{ sid }}</option>
+            {% endfor %}
+          </select>
+        {% else %}
+          <input type="text" name="shipment_id" placeholder="SHP-2024-001"/>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn btn-amber btn-sm">✓ Issue Clearance</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Shipment Document Trail</div>
+    {% if shipment_ids %}
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+        {% for sid in shipment_ids %}
+          <a href="/shipment/{{ sid }}" class="btn btn-outline btn-sm">{{ sid }} ↗</a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:.82rem;color:var(--muted)">No shipments on the ledger yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Full Blockchain Ledger -->
+<div class="panel">
+  <div class="panel-title">Full Blockchain Ledger ({{ chain|length }} blocks)</div>
+  <div class="block-scroll">
+    {% for block in chain|reverse %}
+      <div class="block-card" style="{% if errors %}{% for e in errors %}{% if e.block == block.index %}border-color:var(--red);{% endif %}{% endfor %}{% endif %}">
+        <div class="block-card-head">
+          <span class="tag tag-index">#{{ block.index }}</span>
+          {% if block.document.type == "GENESIS" %}
+            <span class="tag" style="border-color:var(--muted);color:var(--muted)">Genesis</span>
+          {% else %}
+            <span class="tag tag-type">{{ block.document.type }}</span>
+          {% endif %}
+          {% if block.document.shipment_id %}
+            <a class="shp-link" href="/shipment/{{ block.document.shipment_id }}">
+              {{ block.document.shipment_id }} ↗
+            </a>
+          {% endif %}
+          <span style="font-size:.7rem;color:var(--muted);font-family:var(--mono)">
+            by {{ block.submitted_by }}
+          </span>
+          <span class="block-ts">{{ block.timestamp }}</span>
+          <!-- Highlight tampered blocks -->
+          {% for err in errors %}
+            {% if err.block == block.index %}
+              <span class="tag tag-red">⚠ TAMPERED</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if block.document.type != "GENESIS" %}
+          <div class="block-fields">
+            {% for k, v in block.document.items() %}
+              {% if k != 'type' %}
+                <div class="f"><span>{{ k.replace('_',' ').title() }}</span>{{ v }}</div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="font-size:.78rem;color:var(--muted)">{{ block.document.message }}</div>
+        {% endif %}
+
+        <div class="hash-strip">
+          <strong>HASH</strong> {{ block.hash }}&nbsp;&nbsp;
+          <strong>PREV</strong> {{ block.previous_hash }}
+        </div>
+      </div>
+      {% if not loop.last %}<div class="chain-link">↕</div>{% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

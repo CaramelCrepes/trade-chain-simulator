@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradeChain Simulator{% block title %}{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #070b0f;
+      --surface:  #0d1117;
+      --panel:    #111820;
+      --border:   #1e2d3d;
+      --border2:  #253545;
+
+      /* Role colours */
+      --exp:      #00c8ff;   /* Exporter  — cyan  */
+      --imp:      #a78bfa;   /* Importer  — violet */
+      --cus:      #f59e0b;   /* Customs   — amber  */
+
+      --green:    #10b981;
+      --red:      #ef4444;
+      --text:     #cdd9e5;
+      --muted:    #566a7f;
+      --mono:     'Share Tech Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans)}
+
+    /* Subtle grid background */
+    body::before{
+      content:'';position:fixed;inset:0;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),
+                       linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:40px 40px;opacity:.25;pointer-events:none;z-index:0
+    }
+    body>*{position:relative;z-index:1}
+
+    /* ── Nav ── */
+    nav{
+      display:flex;align-items:center;gap:1.5rem;
+      padding:0 1.75rem;height:52px;
+      background:rgba(13,17,23,.9);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(8px);
+      position:sticky;top:0;z-index:100
+    }
+    .nav-brand{
+      font-family:var(--mono);font-size:.85rem;color:var(--accent);
+      text-decoration:none;letter-spacing:.08em;margin-right:.5rem
+    }
+    .nav-badge{
+      font-size:.68rem;font-family:var(--mono);
+      padding:2px 10px;border-radius:20px;
+      border:1px solid var(--accent);color:var(--accent);
+      background:rgba(0,0,0,.3)
+    }
+    nav a.nav-link{
+      color:var(--muted);text-decoration:none;font-size:.82rem;
+      transition:color .15s
+    }
+    nav a.nav-link:hover{color:var(--text)}
+    .nav-spacer{flex:1}
+    .nav-user{
+      font-size:.78rem;color:var(--muted);font-family:var(--mono);
+      display:flex;align-items:center;gap:.75rem
+    }
+    .nav-user span{color:var(--accent)}
+    .btn-logout{
+      font-size:.72rem;font-family:var(--mono);
+      background:transparent;border:1px solid var(--border2);
+      color:var(--muted);padding:3px 12px;border-radius:4px;
+      cursor:pointer;transition:all .15s;text-decoration:none
+    }
+    .btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+    /* ── Page container ── */
+    .page{max-width:1200px;margin:0 auto;padding:2rem 1.75rem}
+
+    /* ── Section heading ── */
+    .section-head{margin-bottom:1.75rem}
+    .section-head h1{
+      font-family:var(--mono);font-size:1.2rem;
+      color:var(--accent);letter-spacing:.05em
+    }
+    .section-head p{font-size:.82rem;color:var(--muted);margin-top:.3rem}
+
+    /* ── Panels ── */
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:1.5rem
+    }
+    .panel-title{
+      font-family:var(--mono);font-size:.75rem;color:var(--muted);
+      letter-spacing:.1em;text-transform:uppercase;
+      margin-bottom:1.25rem;padding-bottom:.75rem;
+      border-bottom:1px solid var(--border)
+    }
+
+    /* ── Grid ── */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+    @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+    /* ── Stat cards ── */
+    .stat{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:6px;padding:1rem 1.25rem
+    }
+    .stat-val{font-family:var(--mono);font-size:1.8rem;color:var(--accent)}
+    .stat-lbl{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+    /* ── Blocks / rows ── */
+    .block-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:6px;padding:1rem 1.25rem;margin-bottom:.6rem;
+      transition:border-color .2s
+    }
+    .block-card:hover{border-color:var(--border2)}
+    .block-card-head{
+      display:flex;align-items:center;gap:.75rem;
+      margin-bottom:.6rem;flex-wrap:wrap
+    }
+    .tag{
+      font-family:var(--mono);font-size:.65rem;
+      padding:2px 8px;border-radius:4px;
+      border:1px solid;letter-spacing:.04em
+    }
+    .tag-index{border-color:var(--accent);color:var(--accent);background:rgba(0,200,255,.06)}
+    .tag-type{border-color:var(--border2);color:var(--muted)}
+    .tag-green{border-color:var(--green);color:var(--green);background:rgba(16,185,129,.06)}
+    .tag-red{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.06)}
+    .tag-amber{border-color:var(--cus);color:var(--cus);background:rgba(245,158,11,.06)}
+
+    .block-ts{font-size:.7rem;color:var(--muted);font-family:var(--mono);margin-left:auto}
+    .block-fields{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:.4rem 1.25rem;font-size:.8rem;margin-bottom:.6rem
+    }
+    .block-fields .f span{font-size:.68rem;color:var(--muted);display:block}
+    .hash-strip{
+      font-family:var(--mono);font-size:.6rem;color:var(--muted);
+      padding-top:.6rem;border-top:1px solid var(--border);word-break:break-all
+    }
+    .hash-strip strong{color:var(--accent)}
+
+    /* ── Forms ── */
+    .form-group{margin-bottom:1rem}
+    label{display:block;font-size:.72rem;color:var(--muted);
+          font-family:var(--mono);margin-bottom:.35rem;letter-spacing:.04em}
+    input,select,textarea{
+      width:100%;background:var(--bg);border:1px solid var(--border);
+      color:var(--text);padding:.55rem .85rem;border-radius:5px;
+      font-family:var(--sans);font-size:.85rem;outline:none;
+      transition:border-color .15s
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+    select option{background:var(--surface)}
+
+    /* ── Buttons ── */
+    .btn{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.5rem 1.25rem;border-radius:5px;font-size:.8rem;
+      font-family:var(--mono);font-weight:600;cursor:pointer;
+      border:1px solid transparent;transition:all .15s;
+      text-decoration:none;letter-spacing:.03em
+    }
+    .btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+    .btn-primary:hover{opacity:.85}
+    .btn-outline{background:transparent;border-color:var(--accent);color:var(--accent)}
+    .btn-outline:hover{background:rgba(0,200,255,.08)}
+    .btn-danger{background:transparent;border-color:var(--red);color:var(--red)}
+    .btn-danger:hover{background:rgba(239,68,68,.08)}
+    .btn-amber{background:transparent;border-color:var(--cus);color:var(--cus)}
+    .btn-amber:hover{background:rgba(245,158,11,.08)}
+    .btn-green{background:transparent;border-color:var(--green);color:var(--green)}
+    .btn-green:hover{background:rgba(16,185,129,.08)}
+    .btn-sm{padding:.3rem .85rem;font-size:.72rem}
+
+    /* ── Alerts ── */
+    .alert{
+      padding:.75rem 1rem;border-radius:6px;font-size:.82rem;
+      margin-bottom:1.25rem;border:1px solid
+    }
+    .alert-success{background:rgba(16,185,129,.07);border-color:var(--green);color:var(--green)}
+    .alert-error{background:rgba(239,68,68,.07);border-color:var(--red);color:var(--red)}
+    .alert-tamper{
+      background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red);
+      font-family:var(--mono);font-size:.78rem;animation:pulse 1s ease 3
+    }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .alert-info{background:rgba(0,200,255,.06);border-color:var(--accent);color:var(--accent)}
+
+    /* ── Chain connector ── */
+    .chain-link{
+      text-align:center;color:var(--border2);
+      font-family:var(--mono);font-size:.8rem;margin:.1rem 0;
+      letter-spacing:.1em
+    }
+
+    /* ── Shipment link ── */
+    a.shp-link{
+      font-size:.72rem;color:var(--imp);text-decoration:none;
+      font-family:var(--mono)
+    }
+    a.shp-link:hover{text-decoration:underline}
+
+    /* ── Divider ── */
+    .divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+    /* ── Scrollable block list ── */
+    .block-scroll{max-height:440px;overflow-y:auto;padding-right:4px}
+    .block-scroll::-webkit-scrollbar{width:4px}
+    .block-scroll::-webkit-scrollbar-track{background:transparent}
+    .block-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+{% if session.user %}
+<nav style="--accent: {{ 'var(--exp)' if session.user.role == 'exporter' else ('var(--imp)' if session.user.role == 'importer' else 'var(--cus)') }}">
+  <a class="nav-brand" href="/dashboard">⬡ TRADECHAIN</a>
+  <span class="nav-badge">{{ session.user.role | upper }}</span>
+  <a class="nav-link" href="/dashboard">Dashboard</a>
+  {% if session.user.role != 'customs' %}
+    <a class="nav-link" href="/shipment/{{ 'SHP-2024-001' }}">Shipments</a>
+  {% else %}
+    <a class="nav-link" href="/customs">Verify</a>
+  {% endif %}
+  <a class="nav-link" href="/api/chain" target="_blank">API</a>
+  <div class="nav-spacer"></div>
+  <div class="nav-user">
+    <span>{{ session.user.name }}</span>
+    <span style="color:var(--muted)">{{ session.user.company }}</span>
+  </div>
+  <a class="btn-logout" href="/logout">logout</a>
+</nav>
+{% endif %}
+
+<div class="page">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  :root {
+    --accent: {% if session.user.role == 'exporter' %}var(--exp){% elif session.user.role == 'importer' %}var(--imp){% else %}var(--cus){% endif %}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <h1>// SHIPMENT — {{ shipment_id }}</h1>
+  <p>Complete blockchain document trail for this shipment</p>
+</div>
+
+{% if history %}
+  <!-- Timeline summary -->
+  <div class="panel" style="margin-bottom:1.25rem">
+    <div class="panel-title">Document Timeline ({{ history|length }} records)</div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+      {% for b in history %}
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <span class="tag tag-index">#{{ b.index }}</span>
+          <span style="font-size:.75rem;color:var(--muted)">{{ b.document.type }}</span>
+          {% if not loop.last %}
+            <span style="color:var(--border2);font-family:var(--mono)">→</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Full detail -->
+  {% for b in history %}
+    <div class="block-card">
+      <div class="block-card-head">
+        <span class="tag tag-index">#{{ b.index }}</span>
+        <span class="tag tag-type">{{ b.document.type }}</span>
+        {% if b.document.get('status') == 'Customs Cleared' or b.document.get('new_status') == 'Customs Cleared' %}
+          <span class="tag tag-green">CLEARED</span>
+        {% endif %}
+        <span class="block-ts">{{ b.timestamp }}</span>
+      </div>
+      <div class="block-fields">
+        {% for k, v in b.document.items() %}
+          {% if k not in ['type', 'shipment_id'] %}
+            <div class="f"><span>{{ k.replace('_',' ').title() }}</span>{{ v }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="hash-strip">
+        <strong>HASH</strong> {{ b.hash }}<br>
+        <strong>PREV</strong> {{ b.previous_hash }}
+      </div>
+    </div>
+    {% if not loop.last %}<div class="chain-link">↕</div>{% endif %}
+  {% endfor %}
+
+{% else %}
+  <div class="alert alert-info">No documents found for shipment {{ shipment_id }}.</div>
+{% endif %}
+
+<div style="margin-top:1.5rem">
+  <a href="/dashboard" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+</div>
+{% endblock %}
